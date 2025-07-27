@@ -1,0 +1,8 @@
+node_modules
+build
+.next
+dist
+public
+.git
+.gitignore
+.eslintignore
