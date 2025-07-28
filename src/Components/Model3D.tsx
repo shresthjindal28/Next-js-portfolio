@@ -72,6 +72,7 @@ const Shape3D: React.FC<Shape3DProps> = ({ position, color, speed = 1, size = 1,
   return <group position={position}>{getShape()}</group>;
 };
 
+// NOTE: For best performance, compress 3D models using Draco or glTF-Transform before importing.
 const Model3D: React.FC = () => {
   const getInitialViewport = () => ({
     width: typeof window !== 'undefined' ? window.innerWidth : 1024,
