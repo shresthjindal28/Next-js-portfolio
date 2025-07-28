@@ -1,12 +1,12 @@
 
-import { useRef, useState, useEffect } from "react";
+
+import { useRef } from "react";
 import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
-import { lazy, Suspense } from 'react';
-const Home3DModel = lazy(() => import('../Components/Home3DModel'));
+import dynamic from 'next/dynamic';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useLenis } from '../hooks/useLenis';
 
-// Fallback component for 3D model
+
 const ModelFallback: React.FC = () => (
   <div className="w-full h-full flex items-center justify-center">
     <div className="text-primary animate-pulse text-center">
@@ -15,6 +15,11 @@ const ModelFallback: React.FC = () => (
     </div>
   </div>
 );
+
+const Home3DModel = dynamic(() => import('../Components/Home3DModel'), {
+  ssr: false,
+  loading: () => <ModelFallback />,
+});
 
 const Home: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -29,12 +34,6 @@ const Home: React.FC = () => {
   const y2 = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
-  // Delay 3D model render
-  const [showModel, setShowModel] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => setShowModel(true), 1000); // 1 second delay
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <div 
@@ -58,13 +57,7 @@ const Home: React.FC = () => {
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 blur-md animate-pulse" />
             <div className="absolute inset-3 rounded-full bg-dark-800 border border-dark-600" />
             <div className="absolute inset-0 flex items-center justify-center">
-              {showModel ? (
-                <Suspense fallback={<ModelFallback />}>
-                  <Home3DModel />
-                </Suspense>
-              ) : (
-                <ModelFallback />
-              )}
+              <Home3DModel />
             </div>
           </div>
         </motion.div>

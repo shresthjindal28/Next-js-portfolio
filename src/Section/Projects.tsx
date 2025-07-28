@@ -1,8 +1,9 @@
 "use client"
 
 
-import { useEffect, useRef, useState, memo } from "react";
+import { useRef, useState, memo } from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 type ProjectType = {
   id: number;
@@ -16,8 +17,7 @@ type ProjectType = {
   liveUrl?: string;
 };
 
-const projects: ProjectType[] = [
-  // ...existing code...
+const projects: ProjectType[] = [  
   {
     id: 1,
     title: "Employee Management System",
@@ -146,13 +146,10 @@ const projects: ProjectType[] = [
 interface ProjectCardProps {
   project: ProjectType;
   openProjectDetails: (project: ProjectType) => void;
-  imageLoading: Record<number, boolean>;
-  handleImageLoad: (projectId: number, imageUrl: string) => void;
-  handleImageError: (projectId: number) => void;
   projectsRef: React.MutableRefObject<HTMLElement[]>;
 }
 
-const ProjectCard = memo(function ProjectCard({ project, openProjectDetails, imageLoading, handleImageLoad, handleImageError, projectsRef }: ProjectCardProps) {
+const ProjectCard = memo(function ProjectCard({ project, openProjectDetails, projectsRef }: ProjectCardProps) {
   return (
     <div
       key={project.id}
@@ -180,26 +177,16 @@ const ProjectCard = memo(function ProjectCard({ project, openProjectDetails, ima
         {/* Project Image with Dynamic Overlay */}
         <div className="absolute inset-0 z-0 overflow-hidden rounded-xl">
           <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-20 group-hover:opacity-30 transition-all duration-500`}></div>
-          {/* Image loading skeleton */}
-          {imageLoading[project.id] && (
-            <div className="absolute inset-0 bg-gray-800 animate-pulse">
-              <div className="h-full w-full flex items-center justify-center">
-                <svg className="w-12 h-12 text-gray-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              </div>
-            </div>
-          )}
-          {/* Image with fallback */}
-          <img
+          {/* Optimized Image */}
+          <Image
             src={project.imageUrl || project.image}
             alt={project.title}
-            className={`h-full w-full object-cover transition-all duration-1000 ease-in-out 
-            group-hover:scale-110 group-hover:rotate-3 ${imageLoading[project.id] ? 'opacity-0' : 'opacity-100'}`}
-            loading="lazy"
-            onLoad={() => handleImageLoad(project.id, project.imageUrl)}
-            onError={() => handleImageError(project.id)}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-all duration-1000 ease-in-out group-hover:scale-110 group-hover:rotate-3"
+            priority={project.id <= 3}
+            placeholder="blur"
+            blurDataURL="/images/placeholder.png"
             style={{ objectFit: 'cover', objectPosition: 'center' }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent opacity-70 group-hover:opacity-60 transition-all duration-500"></div>
@@ -223,13 +210,15 @@ const ProjectCard = memo(function ProjectCard({ project, openProjectDetails, ima
           </div>
           {/* Enhanced Tags with Staggered Animation */}
           <div className="flex flex-wrap gap-2 mb-2">
-            {project.tags.map((tag, i) => (
-              <span 
-                key={tag + '-' + i} 
+          {project.tags
+            .filter((tag) => tag && tag.trim() !== "")
+            .map((tag, i) => (
+              <span
+                key={`${project.id}-${tag}-${i}`}
                 className="px-3 py-1.5 bg-black/50 backdrop-blur-md rounded-full text-xs
                 text-white border border-white/10 transform translate-y-5 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500"
-                style={{ 
-                  transitionDelay: `${150 + (i * 50)}ms`
+                style={{
+                  transitionDelay: `${150 + i * 50}ms`,
                 }}
               >
                 {tag}
@@ -261,50 +250,11 @@ const ProjectCard = memo(function ProjectCard({ project, openProjectDetails, ima
 });
 
 const ProjectDisplay: React.FC = () => {
-  const [error] = useState(false);
   const [currentProject, setCurrentProject] = useState<ProjectType | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [loadedImages, setLoadedImages] = useState<Record<number, string>>({});
-  const [imageLoading, setImageLoading] = useState<Record<number, boolean>>({});
   const sectionRef = useRef<HTMLDivElement>(null);
   const projectsRef = useRef<HTMLElement[]>([]);
   const titleRef = useRef<HTMLDivElement>(null);
-
-  // Handle image loading
-  const handleImageLoad = (projectId: number, imageUrl: string) => {
-    setLoadedImages(prev => ({
-      ...prev,
-      [projectId]: imageUrl
-    }));
-    setImageLoading(prev => ({
-      ...prev,
-      [projectId]: false
-    }));
-  };
-
-  // Handle image error
-  const handleImageError = (projectId: number) => {
-    setImageLoading(prev => ({
-      ...prev,
-      [projectId]: false
-    }));
-    setLoadedImages(prev => ({
-      ...prev,
-      [projectId]: projects.find(p => p.id === projectId)?.image || ''
-    }));
-  };
-
-  useEffect(() => {
-    const initialLoadingState: Record<number, boolean> = {};
-    projects.forEach(project => {
-      initialLoadingState[project.id] = true;
-    });
-    setImageLoading(initialLoadingState);
-  }, []);
-
-  useEffect(() => {
-    projectsRef.current = projectsRef.current.slice(0, projects.length);
-  }, []);
 
   const openProjectDetails = (project: ProjectType) => {
     setCurrentProject(project);
@@ -321,23 +271,6 @@ const ProjectDisplay: React.FC = () => {
     }
   };
 
-  if (error) {
-    return (
-      <div className="bg-transparent text-white min-h-screen flex flex-col items-center justify-center px-6 py-12">
-        <div className="text-red-500 text-center">
-          <h2 className="text-3xl font-bold mb-4">Oops! Something went wrong</h2>
-          <p className="text-xl">Unable to load projects at this time.</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-6 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="text-white min-h-screen relative" ref={sectionRef}>
       {/* Hero Section */}
@@ -352,23 +285,19 @@ const ProjectDisplay: React.FC = () => {
 
       {/* Project Grid */}
       <div className="container mx-auto px-6 py-16 md:py-24">
-        {/* Enhanced Projects Grid (no filter) */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              openProjectDetails={openProjectDetails}
-              imageLoading={imageLoading}
-              handleImageLoad={handleImageLoad}
-              handleImageError={handleImageError}
-              projectsRef={projectsRef}
-            />
+              <ProjectCard
+                key={`project-card-${project.id}`}
+                project={project}
+                openProjectDetails={openProjectDetails}
+                projectsRef={projectsRef}
+              />
           ))}
         </div>
       </div>
 
-      {/* Project Detail Modal - Enhanced */}
+      {/* Project Detail Modal */}
       {showModal && currentProject && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm overflow-y-auto" 
@@ -386,24 +315,16 @@ const ProjectDisplay: React.FC = () => {
           >
             <div className="relative h-[300px] md:h-[400px]">
               <div className={`absolute inset-0 bg-gradient-to-br ${currentProject.color} opacity-20`}></div>
-              {/* Image loading state */}
-              <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
-                <svg className="w-12 h-12 text-gray-600 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-              </div>
-              <img 
-                src={loadedImages[currentProject.id] || currentProject.imageUrl || currentProject.image} 
-                alt={currentProject.title} 
+              <Image
+                src={currentProject.imageUrl || currentProject.image}
+                alt={currentProject.title}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="w-full h-full object-cover"
-                onLoad={(e) => (e.target as HTMLImageElement).previousElementSibling?.classList.add('hidden')}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = currentProject.image;
-                  target.previousElementSibling?.classList.add('hidden');
-                }}
+                priority
+                placeholder="blur"
+                blurDataURL="/images/placeholder.png"
+                style={{ objectFit: 'cover', objectPosition: 'center' }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
               <button 
@@ -421,11 +342,13 @@ const ProjectDisplay: React.FC = () => {
             </div>
             <div className="p-6 md:p-8">
               <div className="flex flex-wrap gap-2 mb-8">
-                {currentProject.tags.map((tag, i) => (
-                  <span key={tag + '-' + i} className="px-3 py-1.5 bg-yellow-400/10 rounded-full text-xs text-yellow-400 border border-yellow-500/30">
-                    {tag}
-                  </span>
-                ))}
+                {currentProject.tags
+                  .filter((tag) => tag && tag.trim() !== "")
+                  .map((tag, i) => (
+                    <span key={`${currentProject.id}-${tag}-${i}`} className="px-3 py-1.5 bg-yellow-400/10 rounded-full text-xs text-yellow-400 border border-yellow-500/30">
+                      {tag}
+                    </span>
+                  ))}
               </div>
               <p className="text-gray-300 mb-10 leading-relaxed">{currentProject.description}</p>
               <div className="flex flex-wrap gap-4">

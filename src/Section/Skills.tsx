@@ -492,14 +492,16 @@ const SkillDetailModal = memo<SkillDetailModalProps>(function SkillDetailModal({
           <div className="mt-6">
             <h3 className="text-sm text-dark-200 mb-2">Related Skills</h3>
             <div className="flex flex-wrap gap-2">
-              {skill.related.map((item, index) => (
-                <span 
-                  key={item + '-' + index} 
-                  className="text-xs px-3 py-1 rounded-full bg-dark-600 text-dark-200"
-                >
-                  {item}
-                </span>
-              ))}
+              {skill.related
+                .filter((item) => item && item.trim() !== "")
+                .map((item, index) => (
+                  <span
+                    key={`${skill.name}-related-${item}-${index}`}
+                    className="text-xs px-3 py-1 rounded-full bg-dark-600 text-dark-200"
+                  >
+                    {item}
+                  </span>
+                ))}
             </div>
           </div>
         </div>
@@ -537,14 +539,14 @@ const Skills: React.FC = () => {
         >
           {memoSkills.map((skill, index) => (
             <motion.div
-              key={`${skill.name}-${skill.category}-${index}`}
+              key={`skill-card-${skill.name}-${skill.category}-${index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
               layout
             >
-              <SkillCard 
-                skill={skill} 
+              <SkillCard
+                skill={skill}
                 onClick={handleSkillClick}
               />
             </motion.div>
