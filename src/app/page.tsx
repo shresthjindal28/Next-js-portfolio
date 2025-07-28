@@ -6,7 +6,7 @@ import Navbar from '../Components/Navbar';
 import SectionLoader from '../Components/SectionLoader';
 import { useEffect, useState, Suspense } from 'react';
 
-const Model3D = dynamic(() => import('../Components/Model3D'), { ssr: false, suspense: true });
+const Model3D = dynamic(() => import('../Components/Model3D'), { ssr: false, loading: () => null });
 const Skills = dynamic(() => import('../Section/Skills'), { loading: () => <SectionLoader /> });
 const Contact = dynamic(() => import('../Section/Contact'), { loading: () => <SectionLoader /> });
 const Projects = dynamic(() => import('../Section/Projects'), { loading: () => <SectionLoader /> });
