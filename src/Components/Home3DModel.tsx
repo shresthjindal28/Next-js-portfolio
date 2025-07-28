@@ -241,7 +241,7 @@ const Home3DModel: React.FC = () => {
     };
 
     checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
+    window.addEventListener('resize', checkIsMobile, { passive: true });
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
@@ -258,8 +258,8 @@ const Home3DModel: React.FC = () => {
       setTimeout(() => setAllowScroll(true), 300);
     };
 
-    container.addEventListener('touchstart', handleTouchStart);
-    container.addEventListener('touchend', handleTouchEnd);
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
+    container.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       container.removeEventListener('touchstart', handleTouchStart);
