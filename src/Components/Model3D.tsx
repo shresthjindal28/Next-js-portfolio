@@ -30,7 +30,11 @@ function Shapes({ viewport }: { viewport: { width: number; height: number } }) {
     const shapeTypes = Object.keys(geometries) as (keyof typeof geometries)[];
     const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96f7d2', '#f7d794', '#786fa6', '#f8a5c2', '#63cdda'];
     const area = viewport.width * viewport.height;
-    const numberOfShapes = Math.floor(viewport.width > 768 ? area / 120000 : area / 80000);
+    // Reduce number of shapes for better performance, especially on mobile
+    let numberOfShapes = Math.floor(viewport.width > 768 ? area / 180000 : area / 160000);
+    // Hard cap for mobile
+    if (viewport.width <= 768) numberOfShapes = Math.min(numberOfShapes, 12);
+    else numberOfShapes = Math.min(numberOfShapes, 24);
     const gridSize = Math.sqrt(numberOfShapes);
     const spacing = viewport.width > 768 ? 35 / gridSize : 30 / gridSize;
     return Array.from({ length: numberOfShapes }, (_, i) => {
