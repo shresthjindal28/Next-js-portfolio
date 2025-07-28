@@ -1,6 +1,6 @@
 
 
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 import dynamic from 'next/dynamic';
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -23,6 +23,7 @@ const Home3DModel = dynamic(() => import('../Components/Home3DModel'), {
 
 const Home: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const modelRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ 
     target: containerRef, 
     offset: ["start start", "end start"] 
@@ -34,6 +35,18 @@ const Home: React.FC = () => {
   const y2 = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
+  // Deferred 3D loading
+  const [show3D, setShow3D] = useState(false);
+  useEffect(() => {
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setShow3D(true);
+      },
+      { threshold: 0.1 }
+    );
+    if (modelRef.current) observer.observe(modelRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div 
@@ -52,12 +65,13 @@ const Home: React.FC = () => {
         <motion.div
           style={{ y: y1, opacity }}
           className="w-full lg:w-1/2 order-2 lg:order-1 mt-8 lg:mt-0 flex items-center justify-center"
+          ref={modelRef}
         >
           <div className="w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] md:w-[400px] md:h-[400px] relative">
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 blur-md animate-pulse" />
             <div className="absolute inset-3 rounded-full bg-dark-800 border border-dark-600" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <Home3DModel />
+              {show3D ? <Home3DModel /> : <ModelFallback />}
             </div>
           </div>
         </motion.div>
