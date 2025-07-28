@@ -33,35 +33,35 @@ const Shape3D: React.FC<Shape3DProps> = ({ position, color, speed = 1, size = 1,
         return (
           <mesh ref={shapeRef}>
             <boxGeometry args={[size, size, size]} />
-            <meshPhysicalMaterial color={color} metalness={0.9} roughness={0.1} clearcoat={1} />
+            <meshStandardMaterial color={color} metalness={0.9} roughness={0.1} />
           </mesh>
         );
       case 'sphere':
         return (
           <mesh ref={shapeRef}>
-            <sphereGeometry args={[size * 0.6, 32, 32]} />
-            <meshPhysicalMaterial color={color} metalness={0.8} roughness={0.2} clearcoat={0.8} />
+            <sphereGeometry args={[size * 0.6, 16, 16]} />
+            <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
           </mesh>
         );
       case 'torus':
         return (
           <mesh ref={shapeRef}>
-            <torusGeometry args={[size * 0.5, size * 0.2, 16, 32]} />
-            <meshPhysicalMaterial color={color} metalness={0.7} roughness={0.3} />
+            <torusGeometry args={[size * 0.5, size * 0.2, 8, 16]} />
+            <meshStandardMaterial color={color} metalness={0.7} roughness={0.3} />
           </mesh>
         );
       case 'octahedron':
         return (
           <mesh ref={shapeRef}>
             <octahedronGeometry args={[size * 0.7]} />
-            <meshPhysicalMaterial color={color} metalness={0.9} roughness={0.1} clearcoat={1} />
+            <meshStandardMaterial color={color} metalness={0.9} roughness={0.1} />
           </mesh>
         );
       case 'icosahedron':
         return (
           <mesh ref={shapeRef}>
             <icosahedronGeometry args={[size * 0.7]} />
-            <meshPhysicalMaterial color={color} metalness={0.8} roughness={0.2} />
+            <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />
           </mesh>
         );
       default:
@@ -98,7 +98,7 @@ const Model3D: React.FC = () => {
     const types: Shape3DProps['type'][] = ['box', 'sphere', 'torus', 'octahedron', 'icosahedron'];
     const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96f7d2', '#f7d794', '#786fa6', '#f8a5c2', '#63cdda'];
     const area = viewport.width * viewport.height;
-    const numberOfShapes = Math.floor(viewport.width > 768 ? area / 15000 : area / 20000);
+    const numberOfShapes = Math.floor(viewport.width > 768 ? area / 45000 : area / 30000);
     const gridSize = Math.sqrt(numberOfShapes);
     const spacing = viewport.width > 768 ? 25 / gridSize : 20 / gridSize;
 
