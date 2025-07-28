@@ -98,7 +98,7 @@ function Shapes({ viewport }: { viewport: { width: number; height: number } }) {
   );
 }
 
-const Model3D: React.FC = () => {
+const Model3DComponent: React.FC = () => {
   const [dpr, setDpr] = useState(1.5);
   const getInitialViewport = () => ({
     width: typeof window !== 'undefined' ? window.innerWidth : 1024,
@@ -119,6 +119,7 @@ const Model3D: React.FC = () => {
     const zPosition = viewport.width < 768 ? 25 : 30;
     return [0, 0, zPosition];
   }, [viewport.width]);
+
   return (
     <Canvas
       camera={{ position: cameraPosition, fov: 60 }}
@@ -141,4 +142,5 @@ const Model3D: React.FC = () => {
   );
 };
 
+const Model3D = React.memo(Model3DComponent);
 export default Model3D;

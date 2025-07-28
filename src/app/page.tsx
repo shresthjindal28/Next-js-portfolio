@@ -1,11 +1,12 @@
 "use client";
 
+
 import dynamic from 'next/dynamic';
 import Navbar from '../Components/Navbar';
 import SectionLoader from '../Components/SectionLoader';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
-const Model3D = dynamic(() => import('../Components/Model3D'), { ssr: false, loading: () => null });
+const Model3D = dynamic(() => import('../Components/Model3D'), { ssr: false, suspense: true });
 const Skills = dynamic(() => import('../Section/Skills'), { loading: () => <SectionLoader /> });
 const Contact = dynamic(() => import('../Section/Contact'), { loading: () => <SectionLoader /> });
 const Projects = dynamic(() => import('../Section/Projects'), { loading: () => <SectionLoader /> });
@@ -37,7 +38,11 @@ const Page = () => {
     <div className="text-white min-h-screen relative w-full overflow-x-hidden bg-dark-800">
       {/* 3D model background, deferred for performance */}
       <div className="fixed inset-0 z-0 pointer-events-none" aria-hidden="true">
-        {isMounted && <Model3D />}
+        {isMounted && (
+          <Suspense fallback={null}>
+            <Model3D />
+          </Suspense>
+        )}
       </div>
       <div className="relative z-10">
         <Navbar />

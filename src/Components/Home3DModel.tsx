@@ -228,7 +228,7 @@ const RotatingShape: React.FC = () => {
 };
 
 // Main 3D Model component
-const Home3DModel: React.FC = () => {
+const Home3DModelComponent: React.FC = () => {
   useLenis();
   const [isMobile, setIsMobile] = useState(false);
   const [allowScroll, setAllowScroll] = useState(false);
@@ -353,4 +353,5 @@ const Home3DModel: React.FC = () => {
   );
 };
 
+const Home3DModel = React.memo(Home3DModelComponent);
 export default Home3DModel;
