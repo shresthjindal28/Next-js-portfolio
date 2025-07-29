@@ -20,6 +20,42 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+
+## Skills
+
+This portfolio showcases the following skills:
+
+- JavaScript, TypeScript
+- React, Next.js
+- Three.js, React Three Fiber
+- Tailwind CSS
+- HTML, CSS
+- Responsive Web Design
+- UI/UX Principles
+- Git & Version Control
+- Docker (basic usage)
+
+## 3D Background Feature
+
+This portfolio includes a custom 3D animated background built with [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/getting-started/introduction) and [drei](https://github.com/pmndrs/drei). The main component for this feature is `Model3D` (`src/Components/Model3D.tsx`).
+
+### Features
+
+- Responsive 3D shapes (box, sphere, torus, octahedron, icosahedron) animated in the background
+- Performance-optimized for desktop and mobile
+- Uses `@react-three/fiber` for rendering and `@react-three/drei` for controls and instancing
+- Ambient and point lighting for visual depth
+- Auto-rotating camera with limited controls
+
+#### Customization
+
+- You can adjust the number, type, and color of shapes in `Model3D.tsx`
+- The camera position and lighting can be tweaked for different visual effects
+
+#### File Reference
+
+- Main 3D component: `src/Components/Model3D.tsx`
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
